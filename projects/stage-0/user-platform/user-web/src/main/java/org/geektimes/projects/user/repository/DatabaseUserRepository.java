@@ -62,6 +62,15 @@ public class DatabaseUserRepository implements UserRepository {
     }
 
     @Override
+    public User getByName(String userName) {
+        return executeQuery("SELECT id,name,password,email,phoneNumber FROM users WHERE name=?",
+                resultSet -> {
+                    // TODO
+                    return new User();
+                }, COMMON_EXCEPTION_HANDLER, userName);
+    }
+
+    @Override
     public User getByNameAndPassword(String userName, String password) {
         return executeQuery("SELECT id,name,password,email,phoneNumber FROM users WHERE name=? and password=?",
                 resultSet -> {

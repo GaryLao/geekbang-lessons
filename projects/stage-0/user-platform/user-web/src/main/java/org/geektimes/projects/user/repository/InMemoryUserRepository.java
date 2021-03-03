@@ -36,6 +36,15 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
+    public User getByName(String userName) {
+        return repository.values()
+                .stream()
+                .filter(user -> Objects.equals(userName, user.getName()))
+                .findFirst()
+                .get();
+    }
+
+    @Override
     public User getByNameAndPassword(String userName, String password) {
         return repository.values()
                 .stream()

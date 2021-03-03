@@ -20,6 +20,8 @@ public interface UserRepository {
 
     User getById(Long userId);
 
+    User getByName(String userName);
+
     User getByNameAndPassword(String userName, String password);
 
     Collection<User> getAll();

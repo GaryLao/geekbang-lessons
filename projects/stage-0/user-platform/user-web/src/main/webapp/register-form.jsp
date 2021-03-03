@@ -23,16 +23,16 @@
 		<form class="form-signin" method="post">
 			<h1 class="h3 mb-3 font-weight-normal">注册</h1>
 
-			<label for="inputEmail" class="sr-only">用户名</label>
+			<label for="username" class="sr-only">用户名</label>
 			<input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名" required autofocus>
 
-			<label for="inputPassword" class="sr-only">登陆密码</label>
+			<label for="userpassword" class="sr-only">登陆密码</label>
 			<input type="password" id="userpassword" name="userpassword" class="form-control" placeholder="请输入登陆密码" required>
 
-			<label for="inputEmail" class="sr-only">电子邮件</label>
+			<label for="email" class="sr-only">电子邮件</label>
 			<input type="text" id="email" name="email" class="form-control" placeholder="请输入电子邮件" required autofocus>
 
-			<label for="inputEmail" class="sr-only">电话</label>
+			<label for="phonenumber" class="sr-only">电话</label>
 			<input type="text" id="phonenumber" name="phonenumber" class="form-control" placeholder="请输入电话" required autofocus>
 
 			<button class="btn btn-lg btn-primary btn-block" type="submit">提交</button>
