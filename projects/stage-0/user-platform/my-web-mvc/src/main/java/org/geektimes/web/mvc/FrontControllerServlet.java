@@ -65,6 +65,7 @@ public class FrontControllerServlet extends HttpServlet {
                 if (pathFromMethod != null) {
                     requestPath += pathFromMethod.value();
                 }
+                //System.out.println("---"+requestPath+"---");
                 handleMethodInfoMapping.put(requestPath,
                         new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
             }
