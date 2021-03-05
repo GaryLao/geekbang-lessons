@@ -1,12 +1,12 @@
 # maven ignore
-# target/
-*.jar
-!.mvn/wrapper/*
-*.war
-*.zip
-*.tar
-*.tar.gz
-.flattened-pom.xml
+#target/
+#*.jar
+#!.mvn/wrapper/*
+#*.war
+#*.zip
+#*.tar
+#*.tar.gz
+#.flattened-pom.xml
 
 # eclipse ignore
 .settings/

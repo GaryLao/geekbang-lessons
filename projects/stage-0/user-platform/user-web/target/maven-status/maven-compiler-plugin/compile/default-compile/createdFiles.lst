@@ -8,4 +8,5 @@ org\geektimes\projects\user\repository\InMemoryUserRepository.class
 org\geektimes\projects\user\web\controller\RegisterController.class
 org\geektimes\projects\user\web\listener\DBConnectionInitializerListener.class
 org\geektimes\projects\user\domain\User.class
+org\geektimes\projects\user\service\UserServiceImpl.class
 org\geektimes\projects\user\repository\DatabaseUserRepository.class

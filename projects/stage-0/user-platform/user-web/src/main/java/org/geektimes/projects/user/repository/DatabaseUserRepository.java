@@ -39,6 +39,21 @@ public class DatabaseUserRepository implements UserRepository {
         this.dbConnectionManager = dbConnectionManager;
     }
 
+    public DatabaseUserRepository() throws SQLException {
+        dbConnectionManager = new DBConnectionManager();
+
+        String databaseURL = "jdbc:derby:db/UserPlatformDB;create=true";
+        Connection connection = DriverManager.getConnection(databaseURL);
+
+        dbConnectionManager.setConnection(connection);
+
+        try {
+            dbConnectionManager.CreateUsersTable();
+        }catch (SQLException e){
+            //throw new SQLException(e.getCause());
+        }
+    }
+
     private Connection getConnection() {
         return dbConnectionManager.getConnection();
     }

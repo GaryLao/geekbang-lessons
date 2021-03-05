@@ -2,6 +2,7 @@ package org.geektimes.projects.user.web.controller;
 
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.repository.DatabaseUserRepository;
+import org.geektimes.projects.user.service.UserServiceImpl;
 import org.geektimes.projects.user.sql.DBConnectionManager;
 import org.geektimes.web.mvc.controller.PageController;
 
@@ -32,23 +33,22 @@ public class RegisterController implements PageController {
                 String phonenumber = request.getParameter("phonenumber");
 
                 //
-                DBConnectionManager dbConnectionManager = new DBConnectionManager();
+                //DBConnectionManager dbConnectionManager = new DBConnectionManager();
+                //
+                //String databaseURL = "jdbc:derby:db/UserPlatformDB;create=true";
+                //Connection connection = DriverManager.getConnection(databaseURL);
+                //dbConnectionManager.setConnection(connection);
+                //
+                //try {
+                //    dbConnectionManager.CreateUsersTable();
+                //}catch (SQLException e){
+                //    //throw new SQLException(e.getCause());
+                //}
 
-                String databaseURL = "jdbc:derby:db/UserPlatformDB;create=true";
-                Connection connection = DriverManager.getConnection(databaseURL);
-                dbConnectionManager.setConnection(connection);
+                //DatabaseUserRepository databaseUserRepository = new DatabaseUserRepository(dbConnectionManager);
+                DatabaseUserRepository databaseUserRepository = new DatabaseUserRepository();
 
-                try {
-                    dbConnectionManager.CreateUsersTable();
-                }catch (SQLException e){
-                    //throw new SQLException(e.getCause());
-                }
-                //System.out.println("--2--");
-
-                DatabaseUserRepository databaseUserRepository = new DatabaseUserRepository(dbConnectionManager);
-                //System.out.println("--1--");
                 User user = databaseUserRepository.getByName(username);
-                //System.out.println("--2--");
 
                 //System.out.println(user.toString());
                 if (user != null && user.getName() != null) {
@@ -62,7 +62,8 @@ public class RegisterController implements PageController {
                     user.setEmail(email);
                     user.setPhoneNumber(phonenumber);
 
-                    if (!databaseUserRepository.save(user)) {
+                    UserServiceImpl userService = new UserServiceImpl(databaseUserRepository);
+                    if (!userService.register(user)) {
                         return "register-false.jsp";
                     } else {
                         return "register-success.jsp";

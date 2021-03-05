@@ -6,5 +6,6 @@
 <body>
 	<div class="container-lg" style="font-size: 16px;">
 		注册失败，已存在相同名称的用户
+		<a href="/register" type="button">返回</a>
 	</div>
 </body>
