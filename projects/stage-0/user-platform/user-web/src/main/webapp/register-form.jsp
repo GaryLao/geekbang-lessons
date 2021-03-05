@@ -34,8 +34,7 @@
 
 			<label for="phonenumber" class="sr-only">电话</label>
 			<input type="text" id="phonenumber" name="phonenumber" class="form-control" placeholder="请输入电话" required autofocus>
-
-
+			
 			<button class="btn btn-lg btn-primary btn-block" type="submit">提交</button>
 			<p class="mt-5 mb-3 text-muted">&copy; 2017-2021</p>
 		</form>

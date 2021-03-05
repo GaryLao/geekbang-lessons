@@ -6,6 +6,6 @@
 <body>
 	<div class="container-lg" style="font-size: 16px;">
 		注册失败，保存到数据库失败
-		<a href="/register" type="button">返回</a>
+		<a href="/register" type="button" class="btn btn-lg btn-primary btn-block">返回</a>
 	</div>
 </body>
