@@ -51,7 +51,7 @@ public class RegisterController implements PageController {
                 User user = databaseUserRepository.getByName(username);
 
                 //System.out.println(user.toString());
-                if (user != null && user.getName() != null) {
+                if (user.getName() != null) {
                     return "register-user-exists.jsp";
                 } else {
                     //System.out.println("username="+username);
