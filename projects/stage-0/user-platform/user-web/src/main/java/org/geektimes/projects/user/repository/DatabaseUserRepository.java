@@ -4,6 +4,7 @@ import org.geektimes.function.ThrowableFunction;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.sql.DBConnectionManager;
 
+import javax.servlet.ServletException;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -23,7 +24,8 @@ public class DatabaseUserRepository implements UserRepository {
     /**
      * 通用处理方式
      */
-    private static Consumer<Throwable> COMMON_EXCEPTION_HANDLER = e -> logger.log(Level.SEVERE, e.getMessage());
+    //private static Consumer<Throwable> COMMON_EXCEPTION_HANDLER = e -> logger.log(Level.SEVERE, e.getMessage());
+    private static final Consumer<Throwable> COMMON_EXCEPTION_HANDLER = Throwable::printStackTrace;
 
     public static final String INSERT_USER_DML_SQL =
             "INSERT INTO users(name,password,email,phoneNumber) VALUES " +
@@ -41,9 +43,25 @@ public class DatabaseUserRepository implements UserRepository {
         return dbConnectionManager.getConnection();
     }
 
+    //public boolean CreateUsersTable() throws SQLException {
+    //    return this.dbConnectionManager.CreateUsersTable();
+    //}
+
     @Override
-    public boolean save(User user) {
-        return false;
+    public boolean save(User user) throws SQLException {
+        //try {
+            //Connection connection = getConnection();
+            //Statement statement = connection.createStatement();
+            //return statement.executeUpdate(INSERT_USER_DML_SQL) > 0;
+
+        //}catch (SQLException e){
+        //    throw new SQLException(e.getCause());
+        //}
+
+        return execute(INSERT_USER_DML_SQL,
+                result -> {
+                    return true;
+                }, COMMON_EXCEPTION_HANDLER, user.getName(), user.getPassword(), user.getEmail(), user.getPhoneNumber());
     }
 
     @Override
@@ -66,7 +84,11 @@ public class DatabaseUserRepository implements UserRepository {
         return executeQuery("SELECT id,name,password,email,phoneNumber FROM users WHERE name=?",
                 resultSet -> {
                     // TODO
-                    return new User();
+                    User user = new User();
+                    if (resultSet.next()) {
+                        user.setName(resultSet.getString("name"));
+                    }
+                    return user;
                 }, COMMON_EXCEPTION_HANDLER, userName);
     }
 
@@ -116,6 +138,45 @@ public class DatabaseUserRepository implements UserRepository {
      * @param <T>
      * @return
      */
+    protected <T> T execute(String sql, ThrowableFunction<Boolean, T> function,
+                                 Consumer<Throwable> exceptionHandler, Object... args) {
+        Connection connection = getConnection();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            for (int i = 0; i < args.length; i++) {
+                Object arg = args[i];
+                Class argType = arg.getClass();
+
+                Class wrapperType = wrapperToPrimitive(argType);
+
+                if (wrapperType == null) {
+                    wrapperType = argType;
+                }
+
+                // Boolean -> boolean
+                String methodName = preparedStatementMethodMappings.get(argType);
+                //System.out.println(arg.toString());
+                //System.out.println(methodName);
+                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+                //method.invoke(preparedStatement, i + 1, args);
+                method.invoke(preparedStatement, i + 1, arg);
+            }
+            Boolean result = preparedStatement.execute();
+            // 返回一个 POJO List -> ResultSet -> POJO List
+            // ResultSet -> T
+            return function.apply(result);
+        } catch (Throwable e) {
+            exceptionHandler.accept(e);
+        }
+        return null;
+    }
+
+    /**
+     * @param sql
+     * @param function
+     * @param <T>
+     * @return
+     */
     protected <T> T executeQuery(String sql, ThrowableFunction<ResultSet, T> function,
                                  Consumer<Throwable> exceptionHandler, Object... args) {
         Connection connection = getConnection();
@@ -133,8 +194,11 @@ public class DatabaseUserRepository implements UserRepository {
 
                 // Boolean -> boolean
                 String methodName = preparedStatementMethodMappings.get(argType);
-                Method method = PreparedStatement.class.getMethod(methodName, wrapperType);
-                method.invoke(preparedStatement, i + 1, args);
+                //System.out.println(arg.toString());
+                //System.out.println(methodName);
+                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+                //method.invoke(preparedStatement, i + 1, args);
+                method.invoke(preparedStatement, i + 1, arg);
             }
             ResultSet resultSet = preparedStatement.executeQuery();
             // 返回一个 POJO List -> ResultSet -> POJO List

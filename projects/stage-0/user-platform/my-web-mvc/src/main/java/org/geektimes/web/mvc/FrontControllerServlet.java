@@ -22,6 +22,7 @@ import javax.ws.rs.Path;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.*;
 
 import static java.util.Arrays.asList;
@@ -53,15 +54,18 @@ public class FrontControllerServlet extends HttpServlet {
      * 利用 ServiceLoader 技术（Java SPI）
      */
     private void initHandleMethods() {
+        //https://juejin.cn/post/6844903891746684941
+        //JDK中，基于SPI的思想，提供了默认具体的实现，ServiceLoader。利用JDK自带的ServiceLoader，可以轻松实现面向服务的注册与发现，完成服务提供与使用的解耦。
+        //META-INF/services/，是ServiceLoader中约定的接口与实现类的关系配置目录，文件名是接口全限定类名，内容是接口对应的具体实现类，如果有多个实现类，分别将不同的实现类都分别作为每一行去配置
         for (Controller controller : ServiceLoader.load(Controller.class)) {
             Class<?> controllerClass = controller.getClass();
-            Path pathFromClass = controllerClass.getAnnotation(Path.class);
+            Path pathFromClass = controllerClass.getAnnotation(Path.class);  //通过getAnnotation()方法获取该类的Path注解
             String requestPath = pathFromClass.value();
             Method[] publicMethods = controllerClass.getMethods();
             // 处理方法支持的 HTTP 方法集合
             for (Method method : publicMethods) {
                 Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
-                Path pathFromMethod = method.getAnnotation(Path.class);
+                Path pathFromMethod = method.getAnnotation(Path.class);  //通过getAnnotation()方法获取该方法Method的Path注解
                 if (pathFromMethod != null) {
                     requestPath += pathFromMethod.value();
                 }
@@ -81,8 +85,8 @@ public class FrontControllerServlet extends HttpServlet {
      */
     private Set<String> findSupportedHttpMethods(Method method) {
         Set<String> supportedHttpMethods = new LinkedHashSet<>();
-        for (Annotation annotationFromMethod : method.getAnnotations()) {
-            HttpMethod httpMethod = annotationFromMethod.annotationType().getAnnotation(HttpMethod.class);
+        for (Annotation annotationFromMethod : method.getAnnotations()) {  //通过调用getAnnotations()方法就可以拿到该类的注解数组
+            HttpMethod httpMethod = annotationFromMethod.annotationType().getAnnotation(HttpMethod.class);  //通过getAnnotation()方法获取该类的HttpMethod注解
             if (httpMethod != null) {
                 supportedHttpMethods.add(httpMethod.value());
             }
@@ -121,22 +125,26 @@ public class FrontControllerServlet extends HttpServlet {
 
         if (controller != null) {
 
+            // 映射到 Method
             HandlerMethodInfo handlerMethodInfo = handleMethodInfoMapping.get(requestMappingPath);
 
             try {
                 if (handlerMethodInfo != null) {
 
+                    //System.out.println("aaa");
                     String httpMethod = request.getMethod();
 
                     if (!handlerMethodInfo.getSupportedHttpMethods().contains(httpMethod)) {
                         // HTTP 方法不支持
+                        System.out.println("HTTP "+httpMethod+" 方法不支持");
                         response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
                         return;
                     }
 
-                    if (controller instanceof PageController) {
-                        PageController pageController = PageController.class.cast(controller);
-                        String viewPath = pageController.execute(request, response);
+                    //System.out.println("bbb");
+                    if (controller instanceof PageController) {  //请求页面属于 PageController 的实例
+                        PageController pageController = PageController.class.cast(controller);  //实例转换为 PageController
+                        String viewPath = pageController.execute(request, response);  //执行实例的execute()方法
                         // 页面请求 forward
                         // request -> RequestDispatcher forward
                         // RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
@@ -147,12 +155,15 @@ public class FrontControllerServlet extends HttpServlet {
                             viewPath = "/" + viewPath;
                         }
                         RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(viewPath);
-                        requestDispatcher.forward(request, response);
+                        //System.out.println("ccc");
+                        requestDispatcher.forward(request, response);  //需要forward到后续Controller，否则页面无法显示
+                        //System.out.println("ddd");
                         return;
-                    } else if (controller instanceof RestController) {
+                    } else if (controller instanceof RestController) {  //请求页面属于 RestController 的实例
                         // TODO
                     }
 
+                    System.out.println("finish");
                 }
             } catch (Throwable throwable) {
                 if (throwable.getCause() instanceof IOException) {

@@ -51,6 +51,12 @@ public class DBConnectionManager {
             "('D','******','d@gmail.com','4') , " +
             "('E','******','e@gmail.com','5')";
 
+    public boolean CreateUsersTable() throws SQLException {
+        Connection connection = getConnection();
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(CREATE_USERS_TABLE_DDL_SQL);
+        return true;
+    }
 
     public static void main(String[] args) throws Exception {
 //        通过 ClassLoader 加载 java.sql.DriverManager -> static 模块 {}
@@ -60,16 +66,17 @@ public class DBConnectionManager {
 //        Driver driver = DriverManager.getDriver("jdbc:derby:/db/user-platform;create=true");
 //        Connection connection = driver.connect("jdbc:derby:/db/user-platform;create=true", new Properties());
 
-        //String databaseURL = "jdbc:derby:/databases/user-platform;create=true";
-        //String databaseURL = "jdbc:derby:W:/BaiduNetdiskDownload/1.小马哥JAVA实战课/github/geekbang-lessons/projects/stage-0/user-platform/user-web/Databases/user-platform;create=true";
-        String databaseURL = "jdbc:derby:/user-web/Databases/user-platform;create=true";
+        //String databaseURL = "jdbc:derby:databases/user-platform;create=true";
+        //String databaseURL = "jdbc:derby:databases/UserPlatformDB;create=true";
+        String databaseURL = "jdbc:derby:db/UserPlatformDB;create=true";
         Connection connection = DriverManager.getConnection(databaseURL);
+        System.out.println("----------1-------------");
 
         Statement statement = connection.createStatement();
         // 删除 users 表
         //System.out.println(statement.execute(DROP_USERS_TABLE_DDL_SQL)); // false
         // 创建 users 表
-        //System.out.println(statement.execute(CREATE_USERS_TABLE_DDL_SQL)); // false
+        System.out.println(statement.execute(CREATE_USERS_TABLE_DDL_SQL)); // false
         System.out.println(statement.executeUpdate(INSERT_USER_DML_SQL));  // 5
 
         // 执行查询语句（DML）
@@ -123,7 +130,7 @@ public class DBConnectionManager {
             for (PropertyDescriptor propertyDescriptor : userBeanInfo.getPropertyDescriptors()) {
                 String fieldName = propertyDescriptor.getName();
                 Class fieldType = propertyDescriptor.getPropertyType();
-                String methodName = typeMethodMappings.get(fieldType);
+                String methodName = typeMethodMappings.get(fieldType);  //getLong getString
                 // 可能存在映射关系（不过此处是相等的）
                 String columnLabel = mapColumnLabel(fieldName);
                 Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);

@@ -2,6 +2,7 @@ package org.geektimes.projects.user.repository;
 
 import org.geektimes.projects.user.domain.User;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public interface UserRepository {
 
-    boolean save(User user);
+    boolean save(User user) throws SQLException;
 
     boolean deleteById(Long userId);
 
